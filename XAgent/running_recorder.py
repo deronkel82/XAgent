@@ -54,7 +54,7 @@ class RunningRecoder():
         os.makedirs(os.path.join(self.record_root_dir, self.now_subtask_id), exist_ok=True)
         with open(
                 os.path.join(self.record_root_dir, self.now_subtask_id, f"plan_refine_{self.plan_refine_id:05d}.json"),
-                "w") as writer:
+                "w", encoding='utf-8') as writer:
             plan_refine_record = {
                 "refine_function_name": dump_common_things(refine_function_name),
                 "refine_function_input": dump_common_things(refine_function_input),
@@ -67,7 +67,7 @@ class RunningRecoder():
 
     def regist_llm_inout(self, messages, functions, function_call, model, stop, other_args, output_data):
         with open(os.path.join(self.record_root_dir, "LLM_inout_pair", f"{self.llm_interface_id:05d}.json"),
-                  "w") as writer:
+                  "w", encoding='utf-8') as writer:
             llm_inout_record = {
                 "input": {
                     "messages": dump_common_things(messages),
@@ -111,7 +111,7 @@ class RunningRecoder():
     def regist_tool_call(self, tool_name, tool_input, tool_output, tool_status_code, thought_data=None):
         os.makedirs(os.path.join(self.record_root_dir, self.now_subtask_id), exist_ok=True)
         with open(os.path.join(self.record_root_dir, self.now_subtask_id, f"tool_{self.tool_call_id:05d}.json"),
-                  "w") as writer:
+                  "w", encoding='utf-8') as writer:
             tool_record = {
                 "tool_name": dump_common_things(tool_name),
                 "tool_input": dump_common_things(tool_input),
@@ -126,7 +126,7 @@ class RunningRecoder():
 
     def regist_tool_server(self, url, payload, output):
         with open(os.path.join(self.record_root_dir, "tool_server_pair", f"{self.tool_server_interface_id:05d}.json"),
-                  "w") as writer:
+                  "w", encoding='utf-8') as writer:
             tool_record = {
                 "url": dump_common_things(url.split("/")[-1]),
                 "payload": dump_common_things(payload),
@@ -152,7 +152,7 @@ class RunningRecoder():
         return None
 
     def regist_query(self, query):
-        with open(os.path.join(self.record_root_dir, f"query.json"), "w") as writer:
+        with open(os.path.join(self.record_root_dir, f"query.json"), "w", encoding='utf-8') as writer:
             json.dump(query.to_json(), writer, indent=2, ensure_ascii=False)
 
     def get_query(self):
@@ -163,7 +163,7 @@ class RunningRecoder():
         return self.query
 
     def regist_config(self, config: XAgentConfig):
-        with open(os.path.join(self.record_root_dir, f"config.json"), "w") as writer:
+        with open(os.path.join(self.record_root_dir, f"config.json"), "w", encoding='utf-8') as writer:
             json.dump(config.to_dict(), writer, indent=2, ensure_ascii=False)
 
     def get_config(self):
@@ -184,32 +184,32 @@ class RunningRecoder():
 
         for dir_name in os.listdir(record_dir):
             if dir_name == "query.json":
-                with open(os.path.join(record_dir, dir_name), "r") as reader:
+                with open(os.path.join(record_dir, dir_name), "r", encoding='utf-8') as reader:
                     self.query_json = json.load(reader)
                     self.query = AutoGPTQuery.from_json(self.query_json)
             elif dir_name == "config.json":
-                with open(os.path.join(record_dir, dir_name), "r") as reader:
+                with open(os.path.join(record_dir, dir_name), "r", encoding='utf-8') as reader:
                     self.config_json = json.load(reader)
                     self.config = XAgentConfig()
                     self.config.merge_from_dict(self.config_json)
             elif dir_name == "LLM_inout_pair":
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
-                    with open(os.path.join(record_dir, dir_name, file_name), "r") as reader:
+                    with open(os.path.join(record_dir, dir_name, file_name), "r", encoding='utf-8') as reader:
                         llm_pair = json.load(reader)
                         self.llm_server_cache.append(llm_pair)
             elif dir_name == "tool_server_pair":
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
-                    with open(os.path.join(record_dir, dir_name, file_name), "r") as reader:
+                    with open(os.path.join(record_dir, dir_name, file_name), "r", encoding='utf-8') as reader:
                         tool_pair = json.load(reader)
                         self.tool_server_cache.append(tool_pair)
             else:
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
                     if file_name.startswith("plan_refine"):
-                        with open(os.path.join(record_dir, dir_name, file_name)) as reader:
+                        with open(os.path.join(record_dir, dir_name, file_name), "r", encoding='utf-8') as reader:
                             plan_refine = json.load(reader)
                             self.plan_refine_cache.append(plan_refine)
                     elif file_name.startswith("tool"):
-                        with open(os.path.join(record_dir, dir_name, file_name)) as reader:
+                        with open(os.path.join(record_dir, dir_name, file_name), "r", encoding='utf-8') as reader:
                             tool_call = json.load(reader)
                             self.tool_call_cache.append(tool_call)
                     else:
